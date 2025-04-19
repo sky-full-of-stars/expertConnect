@@ -2,6 +2,7 @@ package com.uci.expertConnect.service.impl;
 
 import com.uci.expertConnect.dto.CreateExpertProfileRequest;
 import com.uci.expertConnect.exception.DuplicateEmailException;
+import com.uci.expertConnect.exception.ResourceNotFoundException;
 import com.uci.expertConnect.exception.UnauthorizedAccessException;
 import com.uci.expertConnect.model.Expert;
 import com.uci.expertConnect.model.User;
@@ -9,10 +10,16 @@ import com.uci.expertConnect.repository.ExpertRepository;
 import com.uci.expertConnect.repository.UserRepository;
 import com.uci.expertConnect.service.ExpertProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ExpertProfileServiceImpl implements ExpertProfileService {
@@ -45,7 +52,7 @@ public class ExpertProfileServiceImpl implements ExpertProfileService {
 
         // Get the user
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UnauthorizedAccessException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + request.getEmail()));
 
         // Create and save the expert profile
         Expert expert = new Expert();
@@ -56,5 +63,28 @@ public class ExpertProfileServiceImpl implements ExpertProfileService {
         expert.setAvailability(request.getAvailability());
         
         return expertRepository.save(expert);
+    }
+
+    @Override
+    public Expert getExpertById(Long expertId) {
+        return expertRepository.findById(expertId)
+                .orElseThrow(() -> new ResourceNotFoundException("Expert not found with id: " + expertId));
+    }
+
+    @Override
+    public Page<Expert> findExpertsByExpertise(List<String> expertiseList, Pageable pageable) {
+        if (expertiseList.isEmpty()) {
+            return expertRepository.findAll(pageable);
+        }
+        
+        // For each expertise, find matching experts and combine results
+        List<Expert> allExperts = expertiseList.stream()
+                .flatMap(expertise -> 
+                    expertRepository.findByExpertiseOrderByMatchCount(expertise, pageable).getContent().stream()
+                )
+                .distinct()
+                .collect(Collectors.toList());
+                
+        return new PageImpl<>(allExperts, pageable, allExperts.size());
     }
 } 
