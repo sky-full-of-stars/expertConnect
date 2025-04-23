@@ -3,7 +3,10 @@ package com.uci.expertConnect.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -18,8 +21,11 @@ public class Expert {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     
-    @ElementCollection
-    @CollectionTable(name = "expert_expertise", joinColumns = @JoinColumn(name = "expert_id"))
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "expert_expertise",
+        joinColumns = @JoinColumn(name = "expert_id")
+    )
     @Column(name = "expertise")
     private List<String> expertise;
     
@@ -29,6 +35,7 @@ public class Expert {
     @Column(columnDefinition = "TEXT")
     private String bio;
     
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private String availability;
+    private Map<String, Object> availability;
 } 
