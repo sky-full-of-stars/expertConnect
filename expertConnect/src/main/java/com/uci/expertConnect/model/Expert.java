@@ -1,9 +1,11 @@
 package com.uci.expertConnect.model;
 
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 import java.util.List;
 import java.util.Map;
@@ -38,4 +40,11 @@ public class Expert {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private Map<String, Object> availability;
+
+    // Use pgvector to store the bio embedding as a vector
+    @Basic
+    @Type(JsonType.class)
+    @Column(name = "bio_embedding", columnDefinition = "vector(1536)")
+    private List<Double> bioEmbedding;
+
 } 
