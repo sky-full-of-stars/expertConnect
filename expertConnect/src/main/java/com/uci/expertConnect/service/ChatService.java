@@ -1,4 +1,5 @@
 package com.uci.expertConnect.service;
 
-public class ChatService {
+public interface ChatService {
+    String getChatReply(String userId, String message);
 }
