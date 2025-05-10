@@ -52,17 +52,23 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Zoom API Client -->
-		<dependency>
-			<groupId>com.github.zoom</groupId>
-			<artifactId>zoom-api-sdk</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-		
 		<!-- JavaMail API for email -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
+		<!-- JSON Processing -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
+		<!-- SpringDoc OpenAPI (Swagger) -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.3.0</version>
 		</dependency>
 	</dependencies>
 
