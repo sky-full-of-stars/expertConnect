@@ -22,4 +22,12 @@ public interface ExpertRepository extends JpaRepository<Expert, Long> {
         @Param("expertise") String expertise,
         Pageable pageable
     );
+
+    // for vector similarity using pgvector
+    @Query(value = """
+        SELECT id FROM experts 
+        ORDER BY bio_embedding <#> cast(:embedding as vector) 
+        LIMIT 50
+        """, nativeQuery = true)
+    List<Integer> findTop50ByEmbedding(@Param("embedding") float[] embedding);
 } 

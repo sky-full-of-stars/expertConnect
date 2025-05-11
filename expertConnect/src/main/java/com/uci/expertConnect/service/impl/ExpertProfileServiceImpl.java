@@ -3,6 +3,8 @@ package com.uci.expertConnect.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uci.expertConnect.dto.request.CreateExpertProfileRequest;
+import com.uci.expertConnect.dto.request.EmbeddingRequest;
+import com.uci.expertConnect.dto.response.EmbeddingResponse;
 import com.uci.expertConnect.dto.response.ExpertResponse;
 import com.uci.expertConnect.dto.response.UserResponse;
 import com.uci.expertConnect.model.Expert;
@@ -18,9 +20,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +39,9 @@ public class ExpertProfileServiceImpl implements ExpertProfileService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private WebClient.Builder webClientBuilder;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -59,12 +67,43 @@ public class ExpertProfileServiceImpl implements ExpertProfileService {
             // Parse the JSON string to a Map
             Map<String, Object> availabilityMap = objectMapper.readValue(request.getAvailability(), Map.class);
 
+            // Create the request body for embedding (send only the bio text with id 1)
+            EmbeddingRequest embeddingRequest = new EmbeddingRequest();
+            List<EmbeddingRequest.Item> items = new ArrayList<>();
+            items.add(new EmbeddingRequest.Item(1, request.getBio()));  // Set id as 1 and pass the bio text
+            embeddingRequest.setItems(items);
+
+            // Send the request to the FastAPI service (this is the external call to your Python API)
+            WebClient webClient = webClientBuilder.baseUrl("http://localhost:8000").build();
+            EmbeddingResponse response = webClient.post()
+                    .uri("/generate-embedding")
+                    .bodyValue(embeddingRequest)
+                    .retrieve()
+                    .bodyToMono(EmbeddingResponse.class)
+                    .block(); // block() is used for synchronous calls
+
+            // Get the embeddings from the response
+            List<EmbeddingResponse.Embedding> embeddings = response.getEmbeddings();
+
+            // Check if the embeddings list is not empty
+            if (embeddings.isEmpty()) {
+                throw new RuntimeException("No embeddings returned from the FastAPI service.");
+            }
+
+            // Assuming you get the first embedding for the bio (if you're passing only one bio)
+            float[] rawEmbedding = embeddings.get(0).getEmbedding();
+            List<Double> bioEmbedding = new ArrayList<>(rawEmbedding.length);
+            for (float f : rawEmbedding) {
+                bioEmbedding.add((double) f);
+            }
+
             Expert expert = new Expert();
             expert.setUser(user);
             expert.setExpertise(request.getExpertise());
             expert.setHourlyRate(request.getHourlyRate());
             expert.setBio(request.getBio());
             expert.setAvailability(availabilityMap);
+            expert.setBioEmbedding(bioEmbedding);
 
             Expert savedExpert = expertRepository.save(expert);
             logger.info("Successfully saved expert profile with ID: {}", savedExpert.getId());
