@@ -20,7 +20,9 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody UserRegistrationRequest request) {
+        logger.info("Received register User request");
         User user = userService.registerUser(request);
+        logger.info("Response successful for register User request");
         return ResponseEntity.ok(user);
     }
 } 
