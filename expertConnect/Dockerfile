@@ -1,5 +1,7 @@
-# Use OpenJDK 17 as the base image
-FROM eclipse-temurin:17-jdk
+FROM ubuntu:22.04
+
+# Avoid interactive prompts during python installation
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Set working directory
 WORKDIR /app
