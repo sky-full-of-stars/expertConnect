@@ -1,7 +1,4 @@
-FROM ubuntu:22.04
-
-# Avoid interactive prompts during python installation
-ENV DEBIAN_FRONTEND=noninteractive
+FROM eclipse-temurin:17-jdk
 
 # Set working directory
 WORKDIR /app
