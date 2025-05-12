@@ -59,12 +59,13 @@ public class ExpertController {
 
     //still have not tested the endpoints
     @GetMapping("/search")
-    public ResponseEntity<Page<Expert>> findExpertsByExpertise(
+    public ResponseEntity<Page<ExpertResponse>> findExpertsByExpertise(
             @RequestParam List<String> expertise,
             Pageable pageable) {
         logger.info("Received search request for expertise: {}", expertise);
         Page<Expert> experts = expertProfileService.findExpertsByExpertise(expertise, pageable);
+        Page<ExpertResponse> expertResponses = experts.map(expertProfileService::mapExpertToResponse);
         logger.info("Found {} experts matching the search criteria", experts.getTotalElements());
-        return ResponseEntity.ok(experts);
+        return ResponseEntity.ok(expertResponses);
     }
 } 
