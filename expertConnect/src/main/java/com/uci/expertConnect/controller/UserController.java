@@ -1,5 +1,8 @@
 package com.uci.expertConnect.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.uci.expertConnect.dto.UserRegistrationRequest;
 import com.uci.expertConnect.model.User;
 import com.uci.expertConnect.service.UserService;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v1/users")
 public class UserController {
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
 
