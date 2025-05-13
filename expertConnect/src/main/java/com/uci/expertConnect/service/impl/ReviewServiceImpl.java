@@ -42,7 +42,8 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public ReviewResponse createReview(Long userId, CreateReviewRequest request) {
+    public ReviewResponse createReview(CreateReviewRequest request) {
+        Long userId = request.getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found with ID: " + userId));
         
