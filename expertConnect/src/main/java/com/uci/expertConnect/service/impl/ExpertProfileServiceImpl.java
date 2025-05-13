@@ -74,7 +74,7 @@ public class ExpertProfileServiceImpl implements ExpertProfileService {
             embeddingRequest.setItems(items);
 
             // Send the request to the FastAPI service (this is the external call to your Python API)
-            WebClient webClient = webClientBuilder.baseUrl("http://localhost:8000").build();
+            WebClient webClient = webClientBuilder.baseUrl("http://localhost:8002").build();
             EmbeddingResponse response = webClient.post()
                     .uri("/generate-embedding")
                     .bodyValue(embeddingRequest)

@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 public class ChatServiceImpl implements ChatService {
 
@@ -17,7 +20,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public String getChatReply(String userId, String message) {
+    public ChatResponse getChatReply(String userId, String message) {
         ChatRequest request = new ChatRequest();
         request.setUserId(userId);
         request.setMessage(message);
@@ -29,6 +32,25 @@ public class ChatServiceImpl implements ChatService {
                 .bodyToMono(ChatResponse.class);
 
         ChatResponse response = responseMono.block(); // synchronous call
-        return response != null ? response.getReply() : "No response from assistant.";
+        return response != null ? response : new ChatResponse();
     }
+
+    @Override
+    public String summarizeConversation(String userId) {
+        WebClient summarizeClient = WebClient.builder()
+                .baseUrl("http://localhost:8001") // Hardcoded base URL
+                .build();
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("userId", userId);
+
+        Mono<String> responseMono = summarizeClient.post()
+                .uri("/summarize-chat")
+                .bodyValue(payload)
+                .retrieve()
+                .bodyToMono(String.class);
+
+        return responseMono.block(); // returns summarized string
+    }
+
 }
