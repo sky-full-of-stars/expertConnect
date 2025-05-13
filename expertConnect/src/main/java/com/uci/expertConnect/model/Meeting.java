@@ -1,5 +1,6 @@
 package com.uci.expertConnect.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,10 +17,12 @@ public class Meeting {
     
     @ManyToOne
     @JoinColumn(name = "expert_id", nullable = false)
+    @JsonBackReference("expert-meetings")
     private Expert expert;
     
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference("user-meetings")
     private User user;
     
     @Column(nullable = false)

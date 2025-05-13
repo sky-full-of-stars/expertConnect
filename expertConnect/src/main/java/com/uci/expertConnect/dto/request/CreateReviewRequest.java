@@ -10,6 +10,9 @@ import lombok.Data;
 public class CreateReviewRequest {
     @NotNull(message = "Expert ID is required")
     private Long expertId;
+
+    @NotNull(message = "User ID is required")
+    private Long userId;
     
     @NotNull(message = "Rating is required")
     @Min(value = 1, message = "Rating must be at least 1")

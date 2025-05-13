@@ -27,11 +27,10 @@ public class RatingsAndReviewsController {
     @PostMapping("/{expertId}/reviews")
     public ResponseEntity<ReviewResponse> createReview(
             @PathVariable Long expertId,
-            @RequestAttribute("userId") Long userId,
             @Valid @RequestBody CreateReviewRequest request) {
-        logger.info("Received request to create review for expert {} by user {}", expertId, userId);
+        logger.info("Received request to create review for expert {}", expertId);
         request.setExpertId(expertId);
-        ReviewResponse response = reviewService.createReview(userId, request);
+        ReviewResponse response = reviewService.createReview(request);
         logger.info("Successfully created review with ID: {}", response.getId());
         return ResponseEntity.ok(response);
     }
