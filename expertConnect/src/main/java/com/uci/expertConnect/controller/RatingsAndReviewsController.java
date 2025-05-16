@@ -52,4 +52,12 @@ public class RatingsAndReviewsController {
         logger.info("Average rating for expert {} is {}", expertId, response.getAverageRating());
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/ratings/update")
+    public ResponseEntity<Void> triggerRatingUpdate() {
+        logger.info("Received request to manually trigger rating update");
+        reviewService.triggerRatingUpdate();
+        logger.info("Successfully triggered rating update");
+        return ResponseEntity.ok().build();
+    }
 } 
