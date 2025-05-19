@@ -1,17 +1,13 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import List
 import redis
 import openai
 import json
 
 app = FastAPI()
-OPENAI_API_KEY="API_KEY"
-
-# OpenAI client
+OPENAI_API_KEY="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"
 client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
-# Redis client (default port 6379)
 r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 class ChatRequest(BaseModel):
@@ -20,32 +16,57 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     reply: str
+    retrieveProfiles: bool
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
     redis_key = f"chat:{req.userId}"
 
-    # Get previous messages
+    # Load previous conversation
     context_json = r.get(redis_key)
     if context_json:
         messages = json.loads(context_json)
     else:
-        messages = [{"role": "system", "content": "You are a helpful assistant."}]
+        messages = [{
+            "role": "system",
+            "content": (
+                "You are a helpful assistant. Your job is to help users by chatting with them, understanding their needs, and offering to connect them with relevant experts only when appropriate.\n\n"
+                "Always respond in the following JSON format:\n"
+                "{\n"
+                '  "reply": "<your natural language response>",\n'
+                '  "retrieveProfiles": <true or false>\n'
+                "}\n\n"
 
-    # Add user's message
+                "Guidelines:\n"
+                "1. If the user's request is vague (e.g., 'I need help'), ask a follow-up question to gather more details. Do NOT set retrieveProfiles to true yet.\n"
+                "2. If you understand the user's issue clearly, you may ask: 'Would you like me to connect you with experts who can help?'. Still, set retrieveProfiles to false until the user agrees.\n"
+                "3. ONLY set retrieveProfiles to true when the user explicitly confirms interest (e.g., replies with 'yes', 'that would be helpful', etc.) after you asked about connecting with experts.\n\n"
+
+                "Keep all responses short, polite, and in helpful tone. Be sure to follow the format strictly."
+            )
+        }]
+
     messages.append({"role": "user", "content": req.message})
 
-    # Call OpenAI
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=messages
     )
-    reply = response.choices[0].message.content
+
+    # Extract raw content
+    raw_reply = response.choices[0].message.content.strip()
+
+    try:
+        parsed = json.loads(raw_reply)
+        reply = parsed.get("reply", "")
+        retrieveProfiles = parsed.get("retrieveProfiles", False)
+    except Exception:
+        # fallback if not parsable
+        reply = raw_reply
+        retrieveProfiles = False
 
     # Add assistant reply to context
-    messages.append({"role": "assistant", "content": reply})
-
-    # Save back to Redis
+    messages.append({"role": "assistant", "content": raw_reply})
     r.set(redis_key, json.dumps(messages))
 
-    return ChatResponse(reply=reply)
+    return ChatResponse(reply=reply, retrieveProfiles=retrieveProfiles)

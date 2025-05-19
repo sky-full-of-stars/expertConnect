@@ -27,7 +27,7 @@ public interface ExpertRepository extends JpaRepository<Expert, Long> {
     @Query(value = """
         SELECT id FROM experts 
         ORDER BY bio_embedding <#> cast(:embedding as vector) 
-        LIMIT 50
+        LIMIT 25
         """, nativeQuery = true)
     List<Integer> findTop50ByEmbedding(@Param("embedding") float[] embedding);
 } 

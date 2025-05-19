@@ -19,7 +19,7 @@ public class ExpertMatchingServiceImpl implements ExpertMatchingService {
     private final RestTemplate restTemplate;
 
     @Value("${embedding.service.url}")
-    private String embeddingServiceUrl; // e.g., http://localhost:8000/generate_embedding
+    private String embeddingServiceUrl; // e.g., http://localhost:8002/generate_embedding
 
     public ExpertMatchingServiceImpl(ExpertRepository expertRepository, RestTemplate restTemplate) {
         this.expertRepository = expertRepository;

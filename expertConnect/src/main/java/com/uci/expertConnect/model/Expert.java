@@ -41,4 +41,9 @@ public class Expert {
     @Column(columnDefinition = "jsonb")
     private Map<String, Object> availability;
 
+    // Use pgvector to store the bio embedding as a vector
+    @Basic
+    @Type(JsonType.class)
+    @Column(name = "bio_embedding", columnDefinition = "vector(1536)")
+    private List<Double> bioEmbedding;
 } 
