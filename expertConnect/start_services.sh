@@ -1,55 +1,18 @@
 #!/bin/bash
 
-# Exit on error
-set -e
-
-echo "Setting up Python services..."
-
 # Kill any existing uvicorn processes
-pkill -f "uvicorn" || true
+pkill -f "uvicorn"
 
-# Source the secrets file for OpenAI API key
+# Source the secrets file
 source ./secrets.sh
 
-# Check if Python virtual environment exists, if not create it
-if [ ! -d "venv" ]; then
-    echo "Creating Python virtual environment..."
-    python3 -m venv venv
-fi
-
 # Activate virtual environment
-echo "Activating virtual environment..."
-source venv/bin/activate
-
-# Install/upgrade pip
-echo "Upgrading pip..."
-pip install --upgrade pip
-
-# Install all required packages
-echo "Installing Python dependencies..."
-pip install -r requirements.txt
-
-# Check if Redis is installed
-if ! command -v redis-server &> /dev/null; then
-    echo "Redis server not found. Installing Redis..."
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS
-        brew install redis
-    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        # Linux
-        sudo apt-get update
-        sudo apt-get install -y redis-server
-    else
-        echo "Unsupported OS for automatic Redis installation. Please install Redis manually."
-        exit 1
-    fi
-fi
+source src/main/java/com/uci/expertConnect/python_services/venv/bin/activate
 
 # Start Redis if not running
 if ! pgrep redis-server > /dev/null; then
     echo "Starting Redis server..."
-    redis-server &
-    sleep 2  # Wait for Redis to start
+    brew services start redis
 fi
 
 # Function to start a service
@@ -74,5 +37,4 @@ echo "Chat Service: http://localhost:8001"
 echo "Embedding Service: http://localhost:8002"
 echo "Summarization Service: http://localhost:8003"
 echo ""
-echo "To stop all services, run: pkill -f uvicorn"
-echo "To stop Redis server, run: redis-cli shutdown" 
+echo "To stop all services, run: pkill -f uvicorn" 
