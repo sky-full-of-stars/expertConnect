@@ -4,8 +4,7 @@ from typing import List
 import openai
 
 # Your OpenAI API Key
-OPENAI_API_KEY="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"
-
+OPENAI_API_KEY = "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"
 openai.api_key = OPENAI_API_KEY
 app = FastAPI()
 
