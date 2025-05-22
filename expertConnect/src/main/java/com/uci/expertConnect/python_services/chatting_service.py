@@ -67,6 +67,6 @@ def chat(req: ChatRequest):
 
     # Add assistant reply to context
     messages.append({"role": "assistant", "content": raw_reply})
-    r.set(redis_key, json.dumps(messages))
+    r.setex(redis_key, 600, json.dumps(messages))  # 600 seconds = 10 minutes
 
     return ChatResponse(reply=reply, retrieveProfiles=retrieveProfiles)
