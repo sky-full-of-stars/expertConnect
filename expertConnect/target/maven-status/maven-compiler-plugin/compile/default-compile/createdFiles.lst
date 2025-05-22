@@ -23,7 +23,6 @@ com/uci/expertConnect/dto/request/CreateExpertProfileRequest.class
 com/uci/expertConnect/dto/response/LoginResponse.class
 com/uci/expertConnect/exception/UnauthorizedException.class
 com/uci/expertConnect/service/impl/S3ServiceImpl.class
-com/uci/expertConnect/service/impl/PaymentServiceImpl.class
 com/uci/expertConnect/service/impl/ZoomServiceImpl.class
 com/uci/expertConnect/exception/DuplicateEmailException.class
 com/uci/expertConnect/dto/request/FindMatchingExpertsRequest.class
@@ -36,7 +35,6 @@ com/uci/expertConnect/service/UserService.class
 com/uci/expertConnect/exception/UnauthorizedAccessException.class
 com/uci/expertConnect/config/OpenApiConfig.class
 com/uci/expertConnect/repository/ReviewRepository.class
-com/uci/expertConnect/service/impl/ChatServiceImpl.class
 com/uci/expertConnect/controller/MeetingsController.class
 com/uci/expertConnect/validation/ExpertRequestValidator.class
 com/uci/expertConnect/validation/ValidJsonString.class
@@ -83,5 +81,4 @@ com/uci/expertConnect/dto/response/EmbeddingResponse.class
 com/uci/expertConnect/dto/response/UserResponse.class
 com/uci/expertConnect/exception/NotFoundException.class
 com/uci/expertConnect/dto/request/CreateReviewRequest.class
-com/uci/expertConnect/service/impl/ExpertMatchingServiceImpl.class
 com/uci/expertConnect/service/impl/ExpertProfileServiceImpl.class
