@@ -44,6 +44,4 @@ fi
 echo "Building the application..."
 ./mvnw clean package -DskipTests
 
-echo "Build completed successfully!"
-
-echo $JAVA_HOME
+echo "Build completed successfully!" 
