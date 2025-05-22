@@ -6,6 +6,9 @@ import lombok.Data;
 @Data
 public class FindMatchingExpertsRequest {
 
+    @NotBlank(message = "User ID is required")
+    private String userId;
+
     @NotBlank(message = "Query is required")
     private String text;
 }

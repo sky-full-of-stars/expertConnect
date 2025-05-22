@@ -41,8 +41,12 @@ public class ChatController {
             logger.info("retrieveProfiles is true. Summarizing conversation...");
             String summarizedConvo = chatService.summarizeConversation(request.getUserId());
             logger.info("Recieved convo summary...");
+
+            FindMatchingExpertsRequest matchRequest = new FindMatchingExpertsRequest();
+            matchRequest.setUserId(request.getUserId());
+            matchRequest.setText(summarizedConvo);
             // Call the expert matching service directly with the summarized text
-            List<Integer> matchingExperts = expertMatchingService.findMatchingExperts(summarizedConvo);
+            List<Integer> matchingExperts = expertMatchingService.findMatchingExperts(matchRequest);
             logger.info("Matching expert IDs returned: {}", matchingExperts);
 
             // Now call the Python FastAPI Redis service to store them
