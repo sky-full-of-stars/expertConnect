@@ -29,6 +29,9 @@ public class User {
     @OneToOne(mappedBy = "user")
     private Expert expert;
     
+    @Column(name = "profile_photo_url")
+    private String profilePhotoUrl;
+    
     public enum UserRole {
         CLIENT,
         EXPERT

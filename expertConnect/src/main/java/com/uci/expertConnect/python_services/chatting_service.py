@@ -1,15 +1,18 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from pydantic import BaseModel
 from typing import List
 import redis
 import openai
 import json
+import os
 
 app = FastAPI()
-OPENAI_API_KEY="API_KEY"
 
-# OpenAI client
-client = openai.OpenAI(api_key=OPENAI_API_KEY)
+# OpenAI client with better error handling
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise ValueError("OPENAI_API_KEY environment variable is not set")
+client = openai.OpenAI(api_key=api_key)
 
 # Redis client (default port 6379)
 r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)

@@ -1,12 +1,15 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from openai import OpenAI
-
-OPENAI_API_KEY="API_KEY"
-
-client = OpenAI(api_key=OPENAI_API_KEY)  # replace with your actual key
+import os
 
 app = FastAPI()
+
+# OpenAI client with better error handling
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise ValueError("OPENAI_API_KEY environment variable is not set")
+client = OpenAI(api_key=api_key)
 
 class ChatRequest(BaseModel):
     messages: list  # [{role: "user", content: "..."}]
