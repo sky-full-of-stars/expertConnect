@@ -1,8 +1,11 @@
 package com.uci.expertConnect.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.uci.expertConnect.dto.request.FindMatchingExpertsRequest;
 import com.uci.expertConnect.repository.ExpertRepository;
+import com.uci.expertConnect.repository.UserSearchHistoryRepository;
 import com.uci.expertConnect.service.ExpertMatchingService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -11,6 +14,9 @@ import java.util.*;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import com.uci.expertConnect.model.UserSearchHistory;
+
+
 
 @Service
 public class ExpertMatchingServiceImpl implements ExpertMatchingService {
@@ -19,17 +25,28 @@ public class ExpertMatchingServiceImpl implements ExpertMatchingService {
     private final RestTemplate restTemplate;
 
     @Value("${embedding.service.url}")
-    private String embeddingServiceUrl; // e.g., http://localhost:8000/generate_embedding
+    private String embeddingServiceUrl; // e.g., http://localhost:8002/generate_embedding
 
     public ExpertMatchingServiceImpl(ExpertRepository expertRepository, RestTemplate restTemplate) {
         this.expertRepository = expertRepository;
         this.restTemplate = restTemplate;
     }
 
+    @Autowired
+    private UserSearchHistoryRepository searchHistoryRepository;
+
     @Override
-    public List<Integer> findMatchingExperts(String query) {
+    public List<Integer> findMatchingExperts(FindMatchingExpertsRequest request) {
+        String userId = request.getUserId();
+        String query = request.getText();
+
+        UserSearchHistory history = new UserSearchHistory();
+        history.setUserId(userId);
+        history.setQuery(query);
+        searchHistoryRepository.save(history);
+
         // Call the embedding service
-        float[] queryEmbedding = getEmbeddingOfQuery(query);
+        float[] queryEmbedding = getEmbeddingOfQuery(request.getText());
         if (queryEmbedding == null || queryEmbedding.length == 0) {
             return Collections.emptyList();
         }

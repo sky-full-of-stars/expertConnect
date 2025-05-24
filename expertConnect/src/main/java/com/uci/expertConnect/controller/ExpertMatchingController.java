@@ -24,11 +24,12 @@ public class ExpertMatchingController {
 
     @PostMapping("/match")
     public List<Integer> findMatchingExperts(@RequestBody FindMatchingExpertsRequest request) {
-        logger.debug("Received request to match experts for text: '{}'", request.getText());
+        logger.info("Received request to match experts for UserId: '{}'", request.getUserId());
+        logger.info("Received request to match experts for text: '{}'", request.getText());
 
-        List<Integer> matchingExperts = expertMatchingService.findMatchingExperts(request.getText());
+        List<Integer> matchingExperts = expertMatchingService.findMatchingExperts(request);
 
-        logger.debug("Matching expert IDs returned: {}", matchingExperts);
+        logger.info("Matching expert IDs returned: {}", matchingExperts);
 
         return matchingExperts;
     }

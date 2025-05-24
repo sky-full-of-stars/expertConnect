@@ -67,13 +67,43 @@ public class ExpertProfileServiceImpl implements ExpertProfileService {
             // Parse the JSON string to a Map
             Map<String, Object> availabilityMap = objectMapper.readValue(request.getAvailability(), Map.class);
 
+            // Create the request body for embedding (send only the bio text with id 1)
+            EmbeddingRequest embeddingRequest = new EmbeddingRequest();
+            List<EmbeddingRequest.Item> items = new ArrayList<>();
+            items.add(new EmbeddingRequest.Item(1, request.getBio()));  // Set id as 1 and pass the bio text
+            embeddingRequest.setItems(items);
+
+            // Send the request to the FastAPI service (this is the external call to your Python API)
+            WebClient webClient = webClientBuilder.baseUrl("http://localhost:8002").build();
+            EmbeddingResponse response = webClient.post()
+                    .uri("/generate-embedding")
+                    .bodyValue(embeddingRequest)
+                    .retrieve()
+                    .bodyToMono(EmbeddingResponse.class)
+                    .block(); // block() is used for synchronous calls
+
+            // Get the embeddings from the response
+            List<EmbeddingResponse.Embedding> embeddings = response.getEmbeddings();
+
+            // Check if the embeddings list is not empty
+            if (embeddings.isEmpty()) {
+                throw new RuntimeException("No embeddings returned from the FastAPI service.");
+            }
+
+            // Assuming you get the first embedding for the bio (if you're passing only one bio)
+            float[] rawEmbedding = embeddings.get(0).getEmbedding();
+            List<Double> bioEmbedding = new ArrayList<>(rawEmbedding.length);
+            for (float f : rawEmbedding) {
+                bioEmbedding.add((double) f);
+            }
+
             Expert expert = new Expert();
             expert.setUser(user);
             expert.setExpertise(request.getExpertise());
             expert.setHourlyRate(request.getHourlyRate());
             expert.setBio(request.getBio());
             expert.setAvailability(availabilityMap);
-            
+            expert.setBioEmbedding(bioEmbedding);
 
             Expert savedExpert = expertRepository.save(expert);
             logger.info("Successfully saved expert profile with ID: {}", savedExpert.getId());
