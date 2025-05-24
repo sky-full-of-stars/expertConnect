@@ -13,4 +13,5 @@ public interface ReviewService {
     Page<ReviewResponse> getReviewsByExpertId(Long expertId, Pageable pageable);
     ExpertRatingResponse getExpertRating(Long expertId);
     void deleteReview(Long reviewId);
+    void triggerRatingUpdate();
 } 

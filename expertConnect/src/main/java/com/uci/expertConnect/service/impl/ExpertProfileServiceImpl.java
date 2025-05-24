@@ -149,6 +149,7 @@ public class ExpertProfileServiceImpl implements ExpertProfileService {
         userResponse.setName(expert.getUser().getName());
         userResponse.setEmail(expert.getUser().getEmail());
         userResponse.setRole(expert.getUser().getRole().name());
+        userResponse.setProfilePhotoUrl(expert.getUser().getProfilePhotoUrl());
         response.setUser(userResponse);
         
         response.setExpertise(expert.getExpertise());

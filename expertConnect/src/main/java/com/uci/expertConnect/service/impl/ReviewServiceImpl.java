@@ -27,17 +27,20 @@ public class ReviewServiceImpl implements ReviewService {
     private final ExpertRepository expertRepository;
     private final UserRepository userRepository;
     private final ExpertRatingRepository expertRatingRepository;
+    private final RatingUpdateScheduler ratingUpdateScheduler;
 
     @Autowired
     public ReviewServiceImpl(
             ReviewRepository reviewRepository,
             ExpertRepository expertRepository,
             UserRepository userRepository,
-            ExpertRatingRepository expertRatingRepository) {
+            ExpertRatingRepository expertRatingRepository,
+            RatingUpdateScheduler ratingUpdateScheduler) {
         this.reviewRepository = reviewRepository;
         this.expertRepository = expertRepository;
         this.userRepository = userRepository;
         this.expertRatingRepository = expertRatingRepository;
+        this.ratingUpdateScheduler = ratingUpdateScheduler;
     }
 
     @Override
@@ -95,6 +98,12 @@ public class ReviewServiceImpl implements ReviewService {
             throw new NotFoundException("Review not found with ID: " + reviewId);
         }
         reviewRepository.deleteById(reviewId);
+    }
+
+    @Override
+    @Transactional
+    public void triggerRatingUpdate() {
+        ratingUpdateScheduler.updateExpertRatings();
     }
 
     private ReviewResponse mapToResponse(Review review) {

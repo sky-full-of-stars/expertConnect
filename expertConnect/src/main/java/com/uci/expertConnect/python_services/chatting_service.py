@@ -1,13 +1,20 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from pydantic import BaseModel
+from typing import List
 import redis
 import openai
 import json
+import os
 
 app = FastAPI()
-OPENAI_API_KEY = "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"
-client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
+# OpenAI client with better error handling
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise ValueError("OPENAI_API_KEY environment variable is not set")
+client = openai.OpenAI(api_key=api_key)
+
+# Redis client (default port 6379)
 r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 class ChatRequest(BaseModel):
@@ -48,6 +55,7 @@ def chat(req: ChatRequest):
 
     messages.append({"role": "user", "content": req.message})
 
+    # Call OpenAI
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=messages

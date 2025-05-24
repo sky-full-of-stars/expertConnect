@@ -1,12 +1,16 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
 import openai
+import os
 
-# Your OpenAI API Key
-OPENAI_API_KEY = "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"
-openai.api_key = OPENAI_API_KEY
 app = FastAPI()
+
+# OpenAI client with better error handling
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise ValueError("OPENAI_API_KEY environment variable is not set")
+client = openai.OpenAI(api_key=api_key)
 
 class TextItem(BaseModel):
     id: int
@@ -18,7 +22,7 @@ class EmbeddingRequest(BaseModel):
 @app.post("/generate-embedding")
 async def generate_embedding(req: EmbeddingRequest):
     # Generate embeddings for all texts in the list
-    response = openai.embeddings.create(
+    response = client.embeddings.create(
         model="text-embedding-ada-002",
         input=[item.text for item in req.items]
     )
