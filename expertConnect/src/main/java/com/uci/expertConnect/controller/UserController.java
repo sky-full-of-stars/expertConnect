@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/v1/users")
@@ -64,6 +66,34 @@ public class UserController {
         return List.of(); // Return empty list if error or no data
     }
 
+
+    @PostMapping("/{userId}/profile-photo")
+    public ResponseEntity<UserResponse> updateProfilePhoto(
+            @PathVariable Long userId,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            logger.info("Received profile photo upload request for user: {}", userId);
+            UserResponse userResponse = userService.updateProfilePhoto(userId, file);
+            logger.info("Successfully updated profile photo for user: {}", userId);
+            return ResponseEntity.ok(userResponse);
+        } catch (IOException e) {
+            logger.error("Error updating profile photo for user {}: {}", userId, e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/{userId}/profile-photo")
+    public ResponseEntity<Void> deleteProfilePhoto(@PathVariable Long userId) {
+        try {
+            logger.info("Received profile photo deletion request for user: {}", userId);
+            userService.deleteProfilePhoto(userId);
+            logger.info("Successfully deleted profile photo for user: {}", userId);
+            return ResponseEntity.ok().build();
+        } catch (IOException e) {
+            logger.error("Error deleting profile photo for user {}: {}", userId, e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     @PostMapping("/{userId}/profile-photo")
     public ResponseEntity<UserResponse> updateProfilePhoto(
