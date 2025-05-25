@@ -1,5 +1,7 @@
 package com.uci.expertConnect.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.uci.expertConnect.dto.TimeSlot;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -9,6 +11,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -39,6 +42,23 @@ public class Expert {
     
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private Map<String, Object> availability;
+    @Type(JsonType.class)
+    private Map<String, List<TimeSlot>> availability;
 
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    private String profilePicture;
+
+    @ElementCollection
+    @CollectionTable(name = "expert_skills", joinColumns = @JoinColumn(name = "expert_id"))
+    @Column(name = "skill")
+    private Set<String> skills;
+
+    @OneToMany(mappedBy = "expert")
+    @JsonBackReference("expert-meetings")
+    private Set<Meeting> meetings;
 } 

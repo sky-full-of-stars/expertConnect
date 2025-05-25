@@ -63,25 +63,20 @@ public class ExpertProfileServiceImpl implements ExpertProfileService {
             throw new UnauthorizedException("Expert profile already exists for this user");
         }
 
-        try {
-            // Parse the JSON string to a Map
-            Map<String, Object> availabilityMap = objectMapper.readValue(request.getAvailability(), Map.class);
+        Expert expert = new Expert();
+        expert.setUser(user);
+        expert.setName(request.getName());
+        expert.setEmail(request.getEmail());
+        expert.setExpertise(request.getExpertise());
+        expert.setHourlyRate(request.getHourlyRate());
+        expert.setBio(request.getBio());
+        expert.setProfilePicture(request.getProfilePicture());
+        expert.setSkills(request.getSkills());
+        expert.setAvailability(request.getAvailability());
 
-            Expert expert = new Expert();
-            expert.setUser(user);
-            expert.setExpertise(request.getExpertise());
-            expert.setHourlyRate(request.getHourlyRate());
-            expert.setBio(request.getBio());
-            expert.setAvailability(availabilityMap);
-            
-
-            Expert savedExpert = expertRepository.save(expert);
-            logger.info("Successfully saved expert profile with ID: {}", savedExpert.getId());
-            return savedExpert;
-        } catch (JsonProcessingException e) {
-            logger.error("Invalid JSON format for availability: {}", e.getMessage());
-            throw new IllegalArgumentException("Invalid JSON format for availability", e);
-        }
+        Expert savedExpert = expertRepository.save(expert);
+        logger.info("Successfully saved expert profile with ID: {}", savedExpert.getId());
+        return savedExpert;
     }
 
     @Override
@@ -122,9 +117,13 @@ public class ExpertProfileServiceImpl implements ExpertProfileService {
         userResponse.setProfilePhotoUrl(expert.getUser().getProfilePhotoUrl());
         response.setUser(userResponse);
         
+        response.setName(expert.getName());
+        response.setEmail(expert.getEmail());
         response.setExpertise(expert.getExpertise());
         response.setHourlyRate(expert.getHourlyRate());
         response.setBio(expert.getBio());
+        response.setProfilePicture(expert.getProfilePicture());
+        response.setSkills(expert.getSkills());
         response.setAvailability(expert.getAvailability());
         return response;
     }
