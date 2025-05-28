@@ -22,7 +22,7 @@ public class RecommendationController {
 
     @GetMapping("/by-history/{userId}")
     public List<Integer> recommendExpertsFromHistory(@PathVariable String userId) {
-        logger.info("Fetching recommended expert IDs for user: {}", userId);
+        logger.info("Fetching recommended expert IDs forr user: {}", userId);
 
         List<String> previousSearches = userSearchHistoryService.getSearchQueriesByUserId(userId);
         Set<Integer> recommendedExpertIds = new LinkedHashSet<>();
