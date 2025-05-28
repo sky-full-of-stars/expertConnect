@@ -95,34 +95,6 @@ public class UserController {
         }
     }
 
-    @PostMapping("/{userId}/profile-photo")
-    public ResponseEntity<UserResponse> updateProfilePhoto(
-            @PathVariable Long userId,
-            @RequestParam("file") MultipartFile file) {
-        try {
-            logger.info("Received profile photo upload request for user: {}", userId);
-            UserResponse userResponse = userService.updateProfilePhoto(userId, file);
-            logger.info("Successfully updated profile photo for user: {}", userId);
-            return ResponseEntity.ok(userResponse);
-        } catch (IOException e) {
-            logger.error("Error updating profile photo for user {}: {}", userId, e.getMessage());
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @DeleteMapping("/{userId}/profile-photo")
-    public ResponseEntity<Void> deleteProfilePhoto(@PathVariable Long userId) {
-        try {
-            logger.info("Received profile photo deletion request for user: {}", userId);
-            userService.deleteProfilePhoto(userId);
-            logger.info("Successfully deleted profile photo for user: {}", userId);
-            return ResponseEntity.ok().build();
-        } catch (IOException e) {
-            logger.error("Error deleting profile photo for user {}: {}", userId, e.getMessage());
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         logger.info("Received login request for email: {}", request.getEmail());
